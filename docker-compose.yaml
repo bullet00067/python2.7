@@ -1,0 +1,7 @@
+version: '2'
+
+services:
+        ubuntu_py27:
+                image: bullet00067/ubuntu_py27:scrapy
+                volumes:
+                        - $PWD/opt:/home/optt:Z
