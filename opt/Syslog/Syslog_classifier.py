@@ -23,17 +23,20 @@ with open(filename+".csv") as file:
             listed.append(line)
         
 #    print(len(listed))
-#    print(listed[4324])
+#    print(listed)
 
 
 # In[246]:
 
 
-list_start=3
-listed[0]=listed[0]+",On status,Off status"
+list_start=1
+listed[0]=listed[0]+",Onstatus,Offstatus"
 with open(filename+"_classified.csv", 'w') as out_f:
     while list_start < len(listed):
-        logcount=listed[list_start].split(",")[5]
+        try:
+            logcount=listed[list_start].split(",")[5]
+        except IndexError:
+            logcount=0
         if int(logcount) > 0:
             end=list_start+int(logcount)+3
             op=0
@@ -77,7 +80,6 @@ with open(filename+"_classified.csv", 'w') as out_f:
                 for v in range(int(logonstart),int(end)):
                     if "Backtrace" in listed[v]:
                         listed[end]=listed[end]+",Kernel panic,Unknown"
- #           print(listed[end])
             list_start=end+1
         else:
             end=list_start+int(logcount)+1
