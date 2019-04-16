@@ -8,7 +8,7 @@ Original file is located at
 """
 
 raw_list=[]
-with open("T[192.168.1.48]_classified.csv") as file:
+with open("T[192.168.1.48]dbg_classified.csv") as file:
     for line in file:
         line = line.strip()
         if len(line)!=0:
@@ -28,9 +28,10 @@ onis_stable = 0
 offis_reboot = 0
 offis_stable = 0
 on_unknown = 0
+off_unknown = 0
 loop_cnt = 0
 end_line_index=[]
-raw_list[item_line]=raw_list[item_line]+",onis_reboot,onis_stable,on_unknown,offis_reboot,offis_stable,total_loop"
+raw_list[item_line]=raw_list[item_line]+",onis_reboot,onis_stable,on_unknown,offis_reboot,offis_stable,off_unknown,total_loop"
 with open("T[192.168.1.48]_statistics.csv", 'w') as out_f:
   for x in range(start_line, len(raw_list)):
     is_end_index=0
@@ -47,6 +48,10 @@ with open("T[192.168.1.48]_statistics.csv", 'w') as out_f:
         onis_stable+=1
         end_line=x
         is_end_index=1
+    if raw_list[x].split(",")[0] == "\"" and raw_list[x].split(",")[5] == "":
+      off_unknown+=1
+      end_line=x
+      is_end_index=1
     if raw_list[x].split(",")[0] == "\"" and raw_list[x].split(",")[5] != "":
       if raw_list[x].split(",")[5] == "offis_reboot":
         offis_reboot+=1
@@ -64,13 +69,14 @@ with open("T[192.168.1.48]_statistics.csv", 'w') as out_f:
     
   #print(end_line_index)
   loop_cnt =offis_reboot+offis_stable
-  #print("onre"+str(onis_reboot))
-  #print("onst"+str(onis_stable))
-  #print("onun"+str(on_unknown))
-  #print("offre"+str(offis_reboot))
-  #print("offst"+str(offis_stable))
-  #print("lcnt"+str(loop_cnt))
-  raw_list[int(end_line_index[0])]+=","+str(onis_reboot)+","+str(onis_stable)+","+str(on_unknown)+","+str(offis_reboot)+","+str(offis_stable)+","+str(loop_cnt)
-  #print("@@"+raw_list[int(end_line_index[0])])
-  for cnt in range(0,len(raw_list)-1):
+  print("onre"+str(onis_reboot))
+  print("onst"+str(onis_stable))
+  print("onun"+str(on_unknown))
+  print("offre"+str(offis_reboot))
+  print("offst"+str(offis_stable))
+  print("offun"+str(off_unknown))
+  print("lcnt"+str(loop_cnt))
+  raw_list[int(end_line_index[0])]+=","+str(onis_reboot)+","+str(onis_stable)+","+str(on_unknown)+","+str(offis_reboot)+","+str(offis_stable)+","+str(off_unknown)+","+str(loop_cnt)
+  print("@@"+raw_list[int(end_line_index[0])])
+  for cnt in range(0,len(raw_list)):
       out_f.write(raw_list[cnt]+"\n")

@@ -16,7 +16,7 @@ listed=[]
 import sys
 filename=sys.argv[1]
 #print(filename)
-with open(filename+".csv") as file:
+with open("T[192.168.1.48]dbg.csv") as file:
     for line in file:
         line = line.strip()
         if len(line)!=0:
@@ -117,7 +117,6 @@ def replace_element(listed, out_f, end, logtype, on_is_reboot, on_is_stable, off
         listed[end]=str_replaced
         #print("5:"+listed[end])      
       if on_is_stable == 1:
-        #print("on_is_stable!!!")
         try:
           listed[end].split(",")[4]        
         except IndexError:
@@ -167,8 +166,8 @@ def replace_element(listed, out_f, end, logtype, on_is_reboot, on_is_stable, off
             str_replaced+=listed[end].split(",")[x]+","
         listed[end]=str_replaced
         #print("8"+listed[end]) 
-      #else:
-        #print("nothing match!!")
+      else:
+        print("nothing match!!")
     else:
       print("logtype mismatch!!")
 #-------------------------------    
@@ -176,13 +175,12 @@ def replace_element(listed, out_f, end, logtype, on_is_reboot, on_is_stable, off
   
 def reducelogs (list_aft_reduced, out_f, logtype, logoffstart, end, logondatacnt, logoffdatacnt):
   if logtype == "ON":
-    #print("logondatacnt:"+str(logondatacnt))
-    #print("logoffdatacnt:"+str(logoffdatacnt))
     out_f.write("=====Relay Noise ON====="+"\n")
     for RLON in range(int(logoffstart)-int(logondatacnt),logoffstart):
-      #print("@@"+listed[x])
+      print("@@"+"RLON="+str(RLON)+":"+listed[RLON])
+      print("##"+str(logoffstart), str(end), str(logondatacnt), str(logoffdatacnt))
       out_f.write(list_aft_reduced[RLON]+"\n")
-  if logtype == "OFF":
+  elif logtype == "OFF":
     out_f.write("=====Relay Noise OFF====="+"\n")
     for RLOFF in range(int(end)-int(logoffdatacnt),end):
       #print("@@"+listed[x])
@@ -260,7 +258,7 @@ def check_status_last5logs (listed, out_f, logtype, logoffstart, end, logondatac
 list_start=1
 list_aft_reduced=listed
 listed[0]=listed[0]+",Onstatus,Offstatus"
-with open(filename+"_classifiedv2.csv", 'w') as out_f:
+with open("T[192.168.1.48]dbg_classified.csv", 'w') as out_f:
     out_f.write(list_aft_reduced[0]+"\n")
     while list_start < len(listed):
         try:
@@ -270,16 +268,16 @@ with open(filename+"_classifiedv2.csv", 'w') as out_f:
         if int(logcount) >0 :
             end=list_start+int(logcount)+3
             op=0
-            while op !=1:
+            while op ==0:
                 try:
                     listed[end].split(",")
                     if listed[end].split(",")[0]!="\"":
                         end=end-1
+                    else:
+                        op=1
                 except IndexError:
                     end=end-1
-                else:
-                    op=1
-            print(listed[end])
+            print("end="+str(end))
             logoncount=listed[end].split(",")[2]
             logoffcount=listed[end].split(",")[3]
 #-----------------Write first line each round-----------------------------------            
@@ -301,14 +299,15 @@ with open(filename+"_classifiedv2.csv", 'w') as out_f:
 #-----------------Relay noise Off Write last 5 logs-----------------------------
                 reducelogs (list_aft_reduced, out_f, "OFF", logoffstart, end, logondatacnt, logoffdatacnt)
                 check_status_last5logs (listed, out_f, "ONOFF", logoffstart, end, logondatacnt, logoffdatacnt)
-            if int(logoncount)==0 and int(logoffcount)>0:
+            elif int(logoncount)==0 and int(logoffcount)>0:
                 logoffstart=int(list_start)+int(logoncount)+1
                 check_kernel_panic_off (listed, logoncount, logoffcount, list_start, end)
 #-----------------Relay noise Off Write last 5 logs-----------------------------
                 reducelogs (list_aft_reduced, out_f, "OFF", logoffstart, end, logondatacnt, logoffdatacnt)            
                 check_status_last5logs (listed, out_f, "OFF", logoffstart, end, logondatacnt, logoffdatacnt)
-            if int(logoncount)>0 and int(logoffcount)==0:
-                logonstart=int(list_start)+1
+            elif int(logoncount)>0 and int(logoffcount)==0:
+                #logonstart=int(list_start)+1
+                logoffstart=end
                 check_kernel_panic_on (listed, logoncount, logoffcount, list_start, end)
 #-----------------Relay noise On Write last 5 logs------------------------------
                 reducelogs (list_aft_reduced, out_f, "ON", logoffstart, end, logondatacnt, logoffdatacnt)            
