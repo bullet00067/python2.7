@@ -16,7 +16,7 @@ listed=[]
 import sys
 filename=sys.argv[1]
 #print(filename)
-with open("T[192.168.1.48].csv") as file:
+with open(filename+".csv") as file:
     for line in file:
         line = line.strip()
         if len(line)!=0:
@@ -31,8 +31,8 @@ is_stable_patterns =["btmgmt:"]
 def replace_element(listed, out_f, end, logtype, on_is_reboot, on_is_stable, off_is_reboot, off_is_stable):
     str_replaced=""
     #print(list_replaced[end])
-    print(on_is_reboot, on_is_stable, off_is_reboot, off_is_stable)
-    print(logtype)
+    #print(on_is_reboot, on_is_stable, off_is_reboot, off_is_stable)
+    #print(logtype)
     if logtype == "ON":
       if on_is_reboot == 1:
         try:
@@ -47,7 +47,7 @@ def replace_element(listed, out_f, end, logtype, on_is_reboot, on_is_stable, off
           else:
             str_replaced+=listed[end].split(",")[x]+","
         listed[end]=str_replaced
-        print("1:"+listed[end])
+        #print("1:"+listed[end])
       if on_is_stable == 1:
         try:
           listed[end].split(",")[4]        
@@ -61,7 +61,7 @@ def replace_element(listed, out_f, end, logtype, on_is_reboot, on_is_stable, off
           else:
             str_replaced+=listed[end].split(",")[x]+","
         listed[end]=str_replaced
-        print("2"+listed[end])
+        #print("2"+listed[end])
     elif logtype == "OFF":
       if off_is_reboot == 1:
         try:
@@ -80,7 +80,7 @@ def replace_element(listed, out_f, end, logtype, on_is_reboot, on_is_stable, off
           else:
             str_replaced+=listed[end].split(",")[x]+","
         listed[end]=str_replaced
-        print("3"+listed[end])
+        #print("3"+listed[end])
       if off_is_stable == 1:
         try:
           listed[end].split(",")[4]        
@@ -98,10 +98,10 @@ def replace_element(listed, out_f, end, logtype, on_is_reboot, on_is_stable, off
           else:
             str_replaced+=listed[end].split(",")[x]+","
         listed[end]=str_replaced
-        print("4"+listed[end])          
+        #print("4"+listed[end])          
 #-------------------------------
     elif logtype == "ONOFF":
-      print(on_is_reboot, on_is_stable, off_is_reboot, off_is_stable)
+      #print(on_is_reboot, on_is_stable, off_is_reboot, off_is_stable)
       if on_is_reboot == 1:
         try:
           listed[end].split(",")[4]        
@@ -115,9 +115,9 @@ def replace_element(listed, out_f, end, logtype, on_is_reboot, on_is_stable, off
           else:
             str_replaced+=listed[end].split(",")[x]+","
         listed[end]=str_replaced
-        print("5:"+listed[end])      
+        #print("5:"+listed[end])      
       if on_is_stable == 1:
-        print("on_is_stable!!!")
+        #print("on_is_stable!!!")
         try:
           listed[end].split(",")[4]        
         except IndexError:
@@ -130,7 +130,7 @@ def replace_element(listed, out_f, end, logtype, on_is_reboot, on_is_stable, off
           else:
             str_replaced+=listed[end].split(",")[x]+","
         listed[end]=str_replaced
-        print("6"+listed[end])
+        #print("6"+listed[end])
       str_replaced=""
       if off_is_reboot == 1:
         try:
@@ -148,7 +148,7 @@ def replace_element(listed, out_f, end, logtype, on_is_reboot, on_is_stable, off
           else:
             str_replaced+=listed[end].split(",")[x]+","
         listed[end]=str_replaced
-        print("7"+listed[end])
+        #print("7"+listed[end])
       if off_is_stable == 1:
         try:
           listed[end].split(",")[4]        
@@ -166,9 +166,9 @@ def replace_element(listed, out_f, end, logtype, on_is_reboot, on_is_stable, off
           else:
             str_replaced+=listed[end].split(",")[x]+","
         listed[end]=str_replaced
-        print("8"+listed[end]) 
-      else:
-        print("nothing match!!")
+        #print("8"+listed[end]) 
+      #else:
+        #print("nothing match!!")
     else:
       print("logtype mismatch!!")
 #-------------------------------    
@@ -176,11 +176,13 @@ def replace_element(listed, out_f, end, logtype, on_is_reboot, on_is_stable, off
   
 def reducelogs (list_aft_reduced, out_f, logtype, logoffstart, end, logondatacnt, logoffdatacnt):
   if logtype == "ON":
+    #print("logondatacnt:"+str(logondatacnt))
+    #print("logoffdatacnt:"+str(logoffdatacnt))
     out_f.write("=====Relay Noise ON====="+"\n")
     for RLON in range(int(logoffstart)-int(logondatacnt),logoffstart):
       #print("@@"+listed[x])
       out_f.write(list_aft_reduced[RLON]+"\n")
-  elif logtype == "OFF":
+  if logtype == "OFF":
     out_f.write("=====Relay Noise OFF====="+"\n")
     for RLOFF in range(int(end)-int(logoffdatacnt),end):
       #print("@@"+listed[x])
@@ -201,7 +203,7 @@ def check_kernel_panic_onoff (listed, logoncount, logoffcount, list_start, end):
 def check_kernel_panic_on (listed, logoncount, logoffcount, list_start, end):
   logonstart=int(list_start)+1
   for v in range(int(logonstart),int(end)):
-    if any( a in listed[v] for v in kernel_panic_patterns):
+    if any( a in listed[v] for a in kernel_panic_patterns):
       listed[end]=listed[end]+",Kernel panic,Unknown"
       break
   
@@ -258,7 +260,7 @@ def check_status_last5logs (listed, out_f, logtype, logoffstart, end, logondatac
 list_start=1
 list_aft_reduced=listed
 listed[0]=listed[0]+",Onstatus,Offstatus"
-with open("T[192.168.1.48]_classified.csv", 'w') as out_f:
+with open(filename+"_classifiedv2.csv", 'w') as out_f:
     out_f.write(list_aft_reduced[0]+"\n")
     while list_start < len(listed):
         try:
@@ -277,6 +279,7 @@ with open("T[192.168.1.48]_classified.csv", 'w') as out_f:
                     end=end-1
                 else:
                     op=1
+            print(listed[end])
             logoncount=listed[end].split(",")[2]
             logoffcount=listed[end].split(",")[3]
 #-----------------Write first line each round-----------------------------------            
@@ -298,13 +301,13 @@ with open("T[192.168.1.48]_classified.csv", 'w') as out_f:
 #-----------------Relay noise Off Write last 5 logs-----------------------------
                 reducelogs (list_aft_reduced, out_f, "OFF", logoffstart, end, logondatacnt, logoffdatacnt)
                 check_status_last5logs (listed, out_f, "ONOFF", logoffstart, end, logondatacnt, logoffdatacnt)
-            elif int(logoncount)==0 and int(logoffcount)>0:
+            if int(logoncount)==0 and int(logoffcount)>0:
                 logoffstart=int(list_start)+int(logoncount)+1
                 check_kernel_panic_off (listed, logoncount, logoffcount, list_start, end)
 #-----------------Relay noise Off Write last 5 logs-----------------------------
                 reducelogs (list_aft_reduced, out_f, "OFF", logoffstart, end, logondatacnt, logoffdatacnt)            
                 check_status_last5logs (listed, out_f, "OFF", logoffstart, end, logondatacnt, logoffdatacnt)
-            elif int(logoncount)>0 and int(logoffcount)==0:
+            if int(logoncount)>0 and int(logoffcount)==0:
                 logonstart=int(list_start)+1
                 check_kernel_panic_on (listed, logoncount, logoffcount, list_start, end)
 #-----------------Relay noise On Write last 5 logs------------------------------
