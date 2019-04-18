@@ -16,7 +16,7 @@ listed=[]
 import sys
 filename=sys.argv[1]
 #print(filename)
-with open("T[192.168.1.48]dbg.csv") as file:
+with open(filename+".csv") as file:
     for line in file:
         line = line.strip()
         if len(line)!=0:
@@ -166,10 +166,6 @@ def replace_element(listed, out_f, end, logtype, on_is_reboot, on_is_stable, off
             str_replaced+=listed[end].split(",")[x]+","
         listed[end]=str_replaced
         #print("8"+listed[end]) 
-      else:
-        print("nothing match!!")
-    else:
-      print("logtype mismatch!!")
 #-------------------------------    
     out_f.write(listed[end]+"\n")
   
@@ -177,8 +173,8 @@ def reducelogs (list_aft_reduced, out_f, logtype, logoffstart, end, logondatacnt
   if logtype == "ON":
     out_f.write("=====Relay Noise ON====="+"\n")
     for RLON in range(int(logoffstart)-int(logondatacnt),logoffstart):
-      print("@@"+"RLON="+str(RLON)+":"+listed[RLON])
-      print("##"+str(logoffstart), str(end), str(logondatacnt), str(logoffdatacnt))
+      #print("@@"+"RLON="+str(RLON)+":"+listed[RLON])
+      #print("##"+str(logoffstart), str(end), str(logondatacnt), str(logoffdatacnt))
       out_f.write(list_aft_reduced[RLON]+"\n")
   elif logtype == "OFF":
     out_f.write("=====Relay Noise OFF====="+"\n")
@@ -258,7 +254,7 @@ def check_status_last5logs (listed, out_f, logtype, logoffstart, end, logondatac
 list_start=1
 list_aft_reduced=listed
 listed[0]=listed[0]+",Onstatus,Offstatus"
-with open("T[192.168.1.48]dbg_classified.csv", 'w') as out_f:
+with open(filename+"_classifiedv2.csv", 'w') as out_f:
     out_f.write(list_aft_reduced[0]+"\n")
     while list_start < len(listed):
         try:
@@ -277,7 +273,7 @@ with open("T[192.168.1.48]dbg_classified.csv", 'w') as out_f:
                         op=1
                 except IndexError:
                     end=end-1
-            print("end="+str(end))
+            #print("end="+str(end))
             logoncount=listed[end].split(",")[2]
             logoffcount=listed[end].split(",")[3]
 #-----------------Write first line each round-----------------------------------            
@@ -316,6 +312,6 @@ with open("T[192.168.1.48]dbg_classified.csv", 'w') as out_f:
             list_start=end+1
         else:
             end=list_start+int(logcount)+1
-            check_status_last5logs (listed, out_f, "ON", logoffstart, end, logondatacnt, logoffdatacnt)
+            #check_status_last5logs (listed, out_f, "ON", logoffstart, end, logondatacnt, logoffdatacnt)
 #-----------------Write last line each round------------------------------------
             list_start=end+1
